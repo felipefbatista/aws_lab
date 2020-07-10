@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  ENV:
+    Type: String
+    Description: environment variable
+Resources:
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+  MinhaLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: meu-buckets3
+        S3Key: !Sub ${ENV}/package.zip
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref ENV
+      Description: lambda function
+      FunctionName: !Sub ${ENV}-minhafuncao
+      Handler: index.handler
+      MemorySize: 256
+      Role: !GetAtt Role.Arn
+      Runtime: nodejs12.x
+      Timeout: 60
+Outputs:
+  MinhaLambda:
+    Value: !Ref MinhaLambda
+  MinhaLambdaArn:
+    Value: !GetAtt MinhaLambda.Arn
