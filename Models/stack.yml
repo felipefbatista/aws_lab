@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  ENV:
+    Type: String
+    Description: environment variable
+Resources:
+  MeuPrimeiroS3:
+      Type: AWS::CloudFormation::Stack
+      Properties:
+        Parameters:
+          NAME: nome-bucket-I
+        TemplateURL: '/s3.yml'
+  MeuSegundoS3:
+      Type: AWS::CloudFormation::Stack
+      Properties:
+        Parameters:
+          NAME: nome-bucket-II
+        TemplateURL: '/s3.yml'

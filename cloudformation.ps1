@@ -3,7 +3,7 @@
 aws cloudformation create-stack `
 --profile felipe --region us-east-1 `
 --stack-name felipedev `
---template-body file://Models/infra.yml `
+--template-body file://Models/stack.yml `
 --parameters `
     ParameterKey=ENV,ParameterValue=dev `
     ParameterKey=KeyPair,ParameterValue=felipeaws `
@@ -14,7 +14,7 @@ aws cloudformation create-stack `
 aws cloudformation update-stack `
 --profile felipe --region us-east-1 `
 --stack-name felipedev `
---template-body file://Models/infra.yml `
+--template-body file://Models/stack.yml `
 --parameters `
     ParameterKey=ENV,ParameterValue=dev `
     ParameterKey=KeyPair,ParameterValue=felipeaws `
@@ -25,7 +25,7 @@ aws cloudformation update-stack `
 aws cloudformation create-change-set `
 --profile felipe --region us-east-1 `
 --stack-name felipedev `
---template-body file://Models/infra.yml `
+--template-body file://Models/stack.yml `
 --parameters `
         ParameterKey=ENV,ParameterValue=dev `
         ParameterKey=KeyPair,ParameterValue=felipeaws `

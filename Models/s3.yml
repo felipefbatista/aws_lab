@@ -1,6 +1,10 @@
 AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  NAME:
+    Type: String
+    Description: Name of S3 bucket
 Resources:
   MeuBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: meu-buckets3
+      BucketName: !Ref NAME
