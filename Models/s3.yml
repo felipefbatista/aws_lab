@@ -1,10 +1,24 @@
 AWSTemplateFormatVersion: 2010-09-09
 Parameters:
+  ENV:
+    Description: Enter the ENV parameter to describe environment of stack
+    ConstraintDescription: must specify dev, hmg or prd.
+    Type: String
+    Default: dev
+    AllowedValues: 
+      - dev
+      - hmg
+      - prd    
   NAME:
     Type: String
-    Description: Name of S3 bucket
+    Description: Enter the Name parameter of S3 bucket
 Resources:
   MeuBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref NAME
+      BucketName: !Sub ${ENV}-${NAME}
+Outputs:
+  BucketArn:
+    Value: !GetAtt [MeuBucket, Arn]
+  BucketWebsiteURL:
+    Value: !GetAtt [MeuBucket, WebsiteURL]

@@ -1,18 +1,26 @@
 AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   ENV:
+    Description: Enter the ENV parameter to describe environment of stack
+    ConstraintDescription: must specify dev, hmg or prd.
     Type: String
-    Description: environment variable
+    Default: dev
+    AllowedValues: 
+      - dev
+      - hmg
+      - prd 
 Resources:
   MeuPrimeiroS3:
       Type: AWS::CloudFormation::Stack
       Properties:
         Parameters:
-          NAME: nome-bucket-I
-        TemplateURL: '/s3.yml'
+          ENV: !Ref ENV 
+          NAME: nomebucket1
+        TemplateURL: https://hmg-meubuckets3.s3.amazonaws.com/s3.yml
   MeuSegundoS3:
       Type: AWS::CloudFormation::Stack
       Properties:
         Parameters:
-          NAME: nome-bucket-II
-        TemplateURL: '/s3.yml'
+          ENV: !Ref ENV
+          NAME: nomebucket2
+        TemplateURL: https://hmg-meubuckets3.s3.amazonaws.com/s3.yml
