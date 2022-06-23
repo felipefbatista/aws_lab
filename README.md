@@ -1,5 +1,5 @@
 # AWS Hands-On Labs
-Lab created for AWS training.
+Lab created for AWS training (hands-on).
 
 ## Infrastructure
 Cloud Formation
