@@ -1,10 +1,16 @@
 AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   ENV:
+    Description: Enter the ENV parameter to describe environment of stack
+    ConstraintDescription: must specify dev, hmg or prd.
     Type: String
-    Description: environment variable
+    Default: dev
+    AllowedValues: 
+      - dev
+      - hmg
+      - prd 
 Resources:
-  Role:
+  RoleLambda:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -18,24 +24,24 @@ Resources:
               - sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
-  MinhaLambda:
+  FuncaoLambda:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: meu-buckets3
-        S3Key: !Sub ${ENV}/package.zip
+        S3Bucket: !Sub ${ENV}-deploy-aws-calculadora
+        S3Key: package.zip
       Environment:
         Variables:
           ENVIRONMENT: !Ref ENV
       Description: lambda function
-      FunctionName: !Sub ${ENV}-minhafuncao
+      FunctionName: !Sub ${ENV}-lambda-calculadora
       Handler: index.handler
       MemorySize: 256
-      Role: !GetAtt Role.Arn
+      Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 60
 Outputs:
-  MinhaLambda:
-    Value: !Ref MinhaLambda
-  MinhaLambdaArn:
-    Value: !GetAtt MinhaLambda.Arn
+  FuncaoLambda:
+    Value: !Ref FuncaoLambda
+  FuncaoLambdaArn:
+    Value: !GetAtt FuncaoLambda.Arn

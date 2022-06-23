@@ -1,0 +1,168 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  LAMBDAARN:
+    Description: Enter the LAMBDA ARN
+    Type: String
+Resources:
+  #Cria Api
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: "my-api"
+      Description: "My API"
+
+  #Defines the structure of a request or response payload for an API method
+  ApiGatewayModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref ApiGatewayRestApi
+      Schema: {}
+
+  #Cria Staga
+  ApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref ApiGatewayDeployment
+      Description: Lambda API Stage v1
+      RestApiId: !Ref ApiGatewayRestApi
+      StageName: 'v1'
+
+  #Deploy
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: 
+      - ApiGatewayMethodSomar
+      - ApiGatewayMethodSubtrair
+    Properties:
+      Description: Lambda API Deployment
+      RestApiId: !Ref ApiGatewayRestApi
+
+  ApiGatewayIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      # A política de confiança define qual entidade pode assumir a role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ''
+            Effect: 'Allow'
+            Principal:
+              Service:
+                - 'apigateway.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      #A politica em si
+      Policies:
+        - PolicyName: LambdaAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action: 'lambda:*'
+                Resource: !Sub ${LAMBDAARN}
+
+  #### SOMAR ####
+  ApiGatewayResourceSomar:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: 'soma'
+      RestApiId: !Ref ApiGatewayRestApi
+  ApiGatewayMethodSomar:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LAMBDAARN}/invocations'
+      OperationName: 'somar'
+      ResourceId: !Ref ApiGatewayResourceSomar
+      RestApiId: !Ref ApiGatewayRestApi
+
+  #### SUBTRAIR ####
+  ApiGatewayResourceSubtrair:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: 'subtracao'
+      RestApiId: !Ref ApiGatewayRestApi
+  ApiGatewayMethodSubtrair:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LAMBDAARN}/invocations'
+      OperationName: 'subtrair'
+      ResourceId: !Ref ApiGatewayResourceSubtrair
+      RestApiId: !Ref ApiGatewayRestApi
+
+  #### DIVIDIR ####
+  ApiGatewayResourceDividir:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: 'divisao'
+      RestApiId: !Ref ApiGatewayRestApi
+  ApiGatewayMethodDividir:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LAMBDAARN}/invocations'
+      OperationName: 'dividir'
+      ResourceId: !Ref ApiGatewayResourceDividir
+      RestApiId: !Ref ApiGatewayRestApi
+
+  #### MULTIPLICAR ####
+  ApiGatewayResourceMultiplicar:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: 'multiplicacao'
+      RestApiId: !Ref ApiGatewayRestApi
+  ApiGatewayMethodMultiplicar:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LAMBDAARN}/invocations'
+      OperationName: 'multiplicar'
+      ResourceId: !Ref ApiGatewayResourceMultiplicar
+      RestApiId: !Ref ApiGatewayRestApi
+  
+Outputs:
+  apiGatewayInvokeURL:
+    Value: !Sub "https://${ApiGatewayRestApi}.execute-api.us-east-1.amazonaws.com/v1/"

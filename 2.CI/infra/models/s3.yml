@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  # @@@@@@@@@@@@ S3 @@@@@@@@@@@@ #
+  MeuBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: src-deploy-aws-calculadora
+    Properties:
+      BucketName: src-deploy-aws-calculadora
+      VersioningConfiguration:
+        Status: Enabled
+Outputs:
+  BucketArn:
+    Value: !GetAtt [MeuBucket, Arn]
+  BucketWebsiteURL:
+    Value: !GetAtt [MeuBucket, WebsiteURL]

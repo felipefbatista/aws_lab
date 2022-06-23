@@ -1,0 +1,159 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:  
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  PrivateSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+Resources:
+  CodebuildSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Sucirity group codebuild project"
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: 0
+          ToPort: 65535
+          IpProtocol: tcp
+      VpcId: !Ref VpcId
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+                - apigateway.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyName: "CodeBuildPermissions"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "*"
+                Resource:
+                  - "*"
+  CodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties: 
+      Artifacts:
+        Type: CODEPIPELINE
+      Cache:
+        Type: LOCAL
+        Modes:
+          - LOCAL_DOCKER_LAYER_CACHE
+          - LOCAL_CUSTOM_CACHE
+      Description: "codebuild project"
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:3.0
+        PrivilegedMode: True
+        EnvironmentVariables:
+          - Name: ENVIRONMENT
+            Value: DEV
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: buildspec.yml
+      TimeoutInMinutes: 59
+      ServiceRole: !Ref CodeBuildRole
+      Tags: 
+        - Key: ENV
+          Value: DEV
+  PipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+      Path: /
+      Policies:
+        -
+          PolicyName: "CodePipelineServicePolicy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "arn:aws:logs:*:*:*"
+              - Effect: Allow
+                Action:
+                  - "s3:*"
+                Resource:
+                  - "arn:aws:s3:::src-deploy-aws-calculadora"
+                  - "arn:aws:s3:::src-deploy-aws-calculadora/*"
+              -
+                Effect: "Allow"
+                Action:
+                  - ecr:*
+                  - iam:PassRole
+                Resource: "*"
+              - 
+                Effect: "Allow"
+                Action:
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuilds
+                Resource: !GetAtt CodeBuild.Arn
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn: !GetAtt PipelineRole.Arn
+      Stages:
+        -
+          Name: Source
+          Actions:
+            -
+              Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Version: 1
+                Provider: S3
+              OutputArtifacts:
+                -
+                  Name: SourceOutput
+              Configuration:
+                S3Bucket: src-deploy-aws-calculadora
+                S3ObjectKey: package.zip
+              RunOrder: 1
+        -
+          Name: Build
+          Actions:
+            -
+              Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref CodeBuild
+              InputArtifacts:
+                -
+                  Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOuput
+      ArtifactStore:
+        Location: src-deploy-aws-calculadora
+        Type: S3
+Outputs:
+  SecurityGroup:
+    Value: !Ref CodebuildSecurityGroup

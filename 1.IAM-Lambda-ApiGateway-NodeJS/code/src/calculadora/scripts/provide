@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+VersionId=$(sh ./scripts/getVersionId)
+aws lambda update-function-code --function-name lambda-calculadora --s3-bucket src-deploy-aws-calculadora --s3-key package.zip

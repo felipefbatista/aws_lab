@@ -1,0 +1,128 @@
+{
+	"info": {
+		"name": "Aws - Calculadora",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Somar",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"primeiro\": 1,\r\n    \"segundo\": 4\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/soma",
+					"protocol": "https",
+					"host": [
+						"cro39k7r4b",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"v0",
+						"soma"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Subtrair",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"primeiro\": 1,\r\n    \"segundo\": 4\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/subtracao",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"subtracao"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dividir",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"primeiro\": 1,\r\n    \"segundo\": 4\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/divisao",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"divisao"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Multiplicar",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"primeiro\": 2,\r\n    \"segundo\": 4\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/multiplicacao",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"multiplicacao"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

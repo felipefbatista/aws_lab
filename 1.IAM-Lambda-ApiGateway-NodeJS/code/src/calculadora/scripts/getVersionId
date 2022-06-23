@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+echo $(aws s3api list-object-versions --bucket src-deploy-aws-calculadora --prefix package.zip --max-items 1 --output json | sed -n '/ *"VersionId": */{ s///; s/ *, *$//; s/"//g; p; }')
